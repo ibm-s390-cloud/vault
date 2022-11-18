@@ -1,0 +1,12 @@
+{
+  "include": [
+    {
+      "scenario": "smoke backend:raft consul_version:1.13.4 distro:ubuntu seal:shamir arch:arm64 artifact_source:crt edition:oss artifact_type:bundle",
+      "aws_region": "us-west-2"
+    },
+    {
+      "scenario": "upgrade backend:consul consul_version:1.13.4 distro:rhel seal:awskms arch:arm64 artifact_source:crt edition:oss artifact_type:bundle",
+      "aws_region": "us-west-2"
+    }
+  ]
+}

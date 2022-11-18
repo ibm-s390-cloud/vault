@@ -1,0 +1,20 @@
+{
+  "include": [
+    {
+      "scenario": "smoke arch:arm64 artifact_source:artifactory backend:consul consul_version:1.13.4 distro:ubuntu edition:oss seal:shamir artifact_type:bundle",
+      "aws_region": "us-east-2"
+    },
+    {
+      "scenario": "smoke arch:arm64 artifact_source:artifactory backend:raft consul_version:1.13.4 distro:rhel edition:oss seal:shamir artifact_type:bundle",
+      "aws_region": "us-west-2"
+    },
+    {
+      "scenario": "upgrade arch:arm64 artifact_source:artifactory backend:consul consul_version:1.14.2 distro:rhel edition:oss seal:shamir artifact_type:bundle",
+      "aws_region": "us-west-2"
+    },
+    {
+      "scenario": "upgrade arch:arm64 artifact_source:artifactory backend:raft consul_version:1.14.2 distro:ubuntu edition:oss seal:awskms artifact_type:bundle",
+      "aws_region": "us-east-2"
+    }
+  ]
+}

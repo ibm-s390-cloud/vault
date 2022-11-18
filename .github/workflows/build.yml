@@ -154,8 +154,8 @@ jobs:
           zip_artifact_name: ${{ env.PKG_NAME }}_${{ needs.product-metadata.outputs.vault-version }}_linux_${{ matrix.arch }}.zip
           redhat_tag: quay.io/redhat-isv-containers/5f89bb5e0b94cf64cfeb500a:${{ env.version }}-ubi
 
-  enos:
-    name: Enos
+  test:
+    name: Test ${{ matrix.build-artifact-name }}
     # Only run the Enos workflow against branches that are created from the
     # hashicorp/vault repository. This has the effect of limiting execution of
     # Enos scenarios to branches that originate from authors that have write
@@ -167,16 +167,23 @@ jobs:
       - product-metadata
       - build-linux
     uses: ./.github/workflows/enos-run.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - matrix-file-name: build-github-oss-linux-amd64-zip
+            build-artifact-name: vault_${{ needs.product-metadata.outputs.vault-version }}_linux_amd64.zip
+          - matrix-file-name: build-github-oss-linux-arm64-zip
+            build-artifact-name: vault_${{ needs.product-metadata.outputs.vault-version }}_linux_arm64.zip
     with:
-      artifact-build-date: ${{ needs.product-metadata.outputs.build-date }}
-      artifact-name: vault_${{ needs.product-metadata.outputs.vault-version }}_linux_amd64.zip
-      artifact-revision: ${{ needs.product-metadata.outputs.vault-revision }}
-      artifact-source: crt
-      artifact-version: ${{ needs.product-metadata.outputs.vault-version }}
+      build-artifact-name: ${{ matrix.build-artifact-name }}
+      matrix-file-name: ${{ matrix.matrix-file-name }}
+      vault-edition: oss
+      vault-revision: ${{ needs.product-metadata.outputs.vault-revision }}
     secrets: inherit
 
-  enos-docker-k8s:
-    name: Enos Docker K8s
+  test-docker-k8s:
+    name: Test Docker K8s
     # Only run the Enos workflow against branches that are created from the
     # hashicorp/vault repository. This has the effect of limiting execution of
     # Enos scenarios to branches that originate from authors that have write
@@ -203,7 +210,7 @@ jobs:
       - build-darwin
       - build-docker
       - build-ubi
-      - enos
-      - enos-docker-k8s
+      - test
+      - test-docker-k8s
     steps:
-      - run: echo "All build and integration workflows have succeeded!"
+      - run: echo "All build and test workflows have succeeded!"

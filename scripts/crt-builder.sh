@@ -43,6 +43,21 @@ function version_base() {
   awk '$1 == "Version" && $2 == "=" { gsub(/"/, "", $3); print $3 }' < "$VERSION_FILE"
 }
 
+# Get the version major
+function version_major() {
+  version_base | cut -d '.' -f 1
+}
+
+# Get the version minor
+function version_minor() {
+  version_base | cut -d '.' -f 2
+}
+
+# Get the version patch
+function version_patch() {
+  version_base | cut -d '.' -f 3
+}
+
 # Get the version pre-release
 function version_pre() {
   : "${VAULT_PRERELEASE:=""}"
@@ -60,13 +75,18 @@ function version_pre() {
 function version_metadata() {
   : "${VAULT_METADATA:=""}"
 
-  if [ -n "$VAULT_METADATA" ]; then
+  if [[ (-n "$VAULT_METADATA") && ("$VAULT_METADATA" != "oss") ]]; then
     echo "$VAULT_METADATA"
     return
   fi
 
   : "${VERSION_FILE:=$(repo_root)/sdk/version/version_base.go}"
   awk '$1 == "VersionMetadata" && $2 == "=" { gsub(/"/, "", $3); print $3 }' < "$VERSION_FILE"
+}
+
+# Get the version formatted for Debian and RHEL packages
+function version_package() {
+  version | awk '{ gsub("-","~",$1); print $1 }'
 }
 
 # Get the build date from the latest commit since it can be used across all
@@ -221,8 +241,20 @@ function main() {
   version-pre)
     version_pre
   ;;
+  version-major)
+    version_major
+  ;;
   version-meta)
     version_metadata
+  ;;
+  version-minor)
+    version_minor
+  ;;
+  version-package)
+    version_package
+  ;;
+  version-patch)
+    version_patch
   ;;
   *)
     echo "unknown sub-command" >&2

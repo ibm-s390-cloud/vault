@@ -288,14 +288,30 @@ crt-get-version:
 crt-get-version-base:
 	@$(CURDIR)/scripts/crt-builder.sh version-base
 
-.PHONY: crt-get-version-pre
-crt-get-version-pre:
-	@$(CURDIR)/scripts/crt-builder.sh version-pre
+.PHONY: crt-get-version-major
+crt-get-version-major:
+	@$(CURDIR)/scripts/crt-builder.sh version-major
 
 .PHONY: crt-get-version-meta
 crt-get-version-meta:
 	@$(CURDIR)/scripts/crt-builder.sh version-meta
 
+.PHONY: crt-get-version-minor
+crt-get-version-minor:
+	@$(CURDIR)/scripts/crt-builder.sh version-minor
+
 .PHONY: crt-prepare-legal
 crt-prepare-legal:
 	@$(CURDIR)/scripts/crt-builder.sh prepare-legal
+
+.PHONY: crt-get-version-package
+crt-get-version-package:
+	@$(CURDIR)/scripts/crt-builder.sh version-package
+
+.PHONY: crt-get-version-patch
+crt-get-version-patch:
+	@$(CURDIR)/scripts/crt-builder.sh version-patch
+
+.PHONY: crt-get-version-pre
+crt-get-version-pre:
+	@$(CURDIR)/scripts/crt-builder.sh version-pre

@@ -1,0 +1,24 @@
+name: enos_release_testing_oss
+
+on:
+  repository_dispatch:
+    types:
+      - enos_release_testing_oss
+      - enos_release_testing_oss::*
+
+jobs:
+  test:
+    name: Test ${{ matrix.matrix-file-name }}
+    if: ${{ startsWith(github.event.client_payload.payload.branch, 'release/') }}
+    uses: ./.github/workflows/enos-run.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - matrix-file-name: enos_release_testing_oss-artifactory-oss-linux-amd64-zip
+          - matrix-file-name: enos_release_testing_oss-artifactory-oss-linux-arm64-zip
+    with:
+      matrix-file-name: ${{ matrix.matrix-file-name }}
+      vault-edition: oss
+      vault-revision: ${{ github.event.client_payload.payload.sha }}
+    secrets: inherit
