@@ -33,6 +33,11 @@ on:
       matrix-file-name:
         required: true
         type: string
+      # The test group we want to run. This corresponds to the test_group attribute
+      # defined in the enos-run-matrices files.
+      matrix-test-group:
+        default: 0
+        type: string
       runs-on:
         # NOTE: The value should be JSON encoded as that's the only way we can
         # pass arrays with workflow_call.
@@ -56,27 +61,24 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
     outputs:
       build-date: ${{ steps.metadata.outputs.build-date }}
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      matrix: ${{ steps.metadata.outputs.matrix }}
       version: ${{ steps.metadata.outputs.version }}
       version-minor: ${{ steps.metadata.outputs.matrix }}
     env:
-      # Pass the vault edition as VAULT_METADATA so the CRT make targets
-      # consider the edition as necessary.
+      # Pass the vault edition as VAULT_METADATA so the CI make targets can create
+      # values that consider the edition.
       VAULT_METADATA: ${{ inputs.vault-edition }}
+      # Pass in the matrix and matrix group for filtering
+      MATRIX_FILE: ./.github/enos-run-matrices/${{ inputs.matrix-file-name }}.json
+      MATRIX_TEST_GROUP: ${{ inputs.matrix-test-group }}
     steps:
       - uses: actions/checkout@v3
       - id: metadata
         run: |
-          echo "build-date=$(make crt-get-date)" >> $GITHUB_OUTPUT
-          echo "version=$(make crt-get-version)" >> $GITHUB_OUTPUT
-          echo "version-minor=$(make crt-get-version-minor)" >> $GITHUB_OUTPUT
-      - name: Load and filter Enos scenario matrix
-        id: matrix
-        # Read the contents of the matrix file and then exclude any scenarios
-        # that don't match the required min_minor_version.
-        run: |
-          matrix=$(cat ./.github/enos-run-matrices/${{ inputs.matrix-file-name }}.json | jq '.include | map(. | select((.min_minor_version == null) or (.min_minor_version <= ${{ steps.metadata.outputs.version-minor }})))')
-          echo "matrix={\"include\":$(echo $matrix)}" >> $GITHUB_OUTPUT
+          echo "build-date=$(make ci-get-date)" >> $GITHUB_OUTPUT
+          echo "version=$(make ci-get-version)" >> $GITHUB_OUTPUT
+          filtered=$(make ci-filter-matrix)
+          echo "matrix=$(echo $filtered)}" >> $GITHUB_OUTPUT
 
   # Run the Enos test scenarios
   run:

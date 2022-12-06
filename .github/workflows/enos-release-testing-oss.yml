@@ -16,9 +16,12 @@ jobs:
       matrix:
         include:
           - matrix-file-name: enos_release_testing_oss-artifactory-oss-linux-amd64-zip
+            test-name: Linux AMD64 Zip
           - matrix-file-name: enos_release_testing_oss-artifactory-oss-linux-arm64-zip
+            test-name: Linux ARM64 Zip
     with:
-      matrix-file-name: ${{ matrix.matrix-file-name }}
+      matrix-file-name: ${{ matrix.test-name }}
+      matrix-test-group: 1
       vault-edition: oss
       vault-revision: ${{ github.event.client_payload.payload.sha }}
     secrets: inherit
